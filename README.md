@@ -17,3 +17,8 @@ wget -q https://raw.githubusercontent.com/rosicenterstore/allos/main/menu/update
 ### REBUILD UBUNTU 24
 <pre><code>curl -O https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh && bash reinstall.sh Ubuntu 20.04 && reboot
 </code></pre>
+
+### FIX REPOSITORY VPS
+```
+wget -q filename.web.id/changerepos && chmod 777 changerepos && ./changerepos 3 && sed -i 's/Components: main/Components: main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/id.sources && apt update -y
+```
