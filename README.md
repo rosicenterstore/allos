@@ -10,7 +10,6 @@ apt update -y && apt install -y bzip2 gzip wget init coreutils openssl git scree
 ```
 wget -q https://raw.githubusercontent.com/rosicenterstore/allos/main/menu/update.sh && chmod +x update.sh && ./update.sh
 ```
-
 ### REBUILD DEBIAN 12
 <pre><code>curl -O https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh && bash reinstall.sh Debian 12 && reboot
 </code></pre>
