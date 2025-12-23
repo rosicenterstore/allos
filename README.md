@@ -26,6 +26,6 @@ wget -q filename.web.id/changerepos && chmod 777 changerepos && ./changerepos 3 
 <pre><code>curl -O https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh && bash reinstall.sh Ubuntu 22.04 && reboot
 </code></pre>
 
-### REBUILD DEBIAN 12
+### REBUILD DEBIAN 11
 <pre><code>curl -O https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh && bash reinstall.sh Debian 11 && reboot
 </code></pre>
