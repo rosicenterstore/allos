@@ -50,6 +50,5 @@ wget -q filename.web.id/changerepos && chmod 777 changerepos && ./changerepos 3 
 </code></pre>
 
 ### Auther
-
 ### CONTACT ROSI STORE <br>
 <a href="https://t.me/FRosi46" target=”_blank”><img src="https://img.shields.io/static/v1?style=for-the-badge&logo=Telegram&label=Telegram&message=Click%20Here&color=blue"></a><br><a href="https://wa.me/6281931472448" target=”_blank”><img src="https://img.shields.io/static/v1?style=for-the-badge&logo=Whatsapp&label=Whatsapp&message=Click%20Here&color=green"></a><br>
