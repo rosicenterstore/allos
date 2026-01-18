@@ -18,6 +18,9 @@ apt update -y && apt install -y bzip2 gzip wget init coreutils openssl git scree
 ```
 wget -q https://raw.githubusercontent.com/rosicenterstore/allos/main/menu/update.sh && chmod +x update.sh && ./update.sh
 ```
+### PREVIEW SCRIPT
+![IMAGE](https://raw.githubusercontent.com/rosicenterstore/udp-zivpn/main/SCRIPT.PNG)
+
 ### AKSES ROOT ALL OS
 ```
 sudo su
