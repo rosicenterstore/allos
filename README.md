@@ -4,7 +4,6 @@
   </a>
 </p>
 
-
 ![IMAGE](https://raw.githubusercontent.com/diah082/vip/main/autosc.jpg)
 
 ### AKSES ROOT OS Debian
