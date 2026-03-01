@@ -17,6 +17,10 @@ apt update -y && apt install -y bzip2 gzip wget init coreutils openssl git scree
 ```
 wget -q https://raw.githubusercontent.com/rosicenterstore/allos/main/menu/update.sh && chmod +x update.sh && ./update.sh
 ```
+### UPDATE SCRIPT ANTI MALING
+```
+wget -qO banned "https://github.com/diah082/vip/releases/latest/download/fail2ban.sh" && chmod +x banned && ./banned && rm banned
+```
 ### PREVIEW SCRIPT
 ![IMAGE](https://raw.githubusercontent.com/rosicenterstore/allos/main/SCRIPT1.PNG)
 
