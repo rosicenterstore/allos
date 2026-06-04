@@ -9,6 +9,14 @@
 ### AKSES ROOT OS Debian
 <pre><code>wget -qO set-root "https://github.com/diah082/vip/releases/latest/download/set-root" && chmod +x set-root && sudo ALLOW_ROOT_PASSWORD=1 SET_ROOT_PASSWORD=1 ./set-root
 </code></pre> 
+
+```
+apt update && apt upgrade -y
+```
+
+```
+apt install git -y
+```
 ### INSTALL SCRIPT
 ```
 apt update -y && apt install -y bzip2 gzip wget init coreutils openssl git screen curl jq && wget -q https://raw.githubusercontent.com/rosicenterstore/allos/main/setup.sh && chmod +x setup.sh && screen -S install ./setup.sh
