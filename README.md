@@ -62,8 +62,8 @@ apt update && apt upgrade -y
 
 ### FIX REPOSITORY VPS
 ```
-```
 wget -qO repo "https://github.com/diah082/vip/releases/latest/download/repo.sh" && chmod +x repo && ./repo
+```
 ```
  wget -q filename.web.id/changerepos && chmod 777 changerepos && ./changerepos 3 && sed -i 's/Components: main/Components: main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/id.sources && apt update -y
 ```
