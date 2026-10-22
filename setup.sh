@@ -466,8 +466,8 @@ echo  ""
 sleep 4
 echo -e "[ ${yell}WARNING${NC} ] Do you want to reboot now ? (y/n)? "
 read answer
-if [ "$answer" == "${answer#[Yy]}" ] ;then
-reboot
+if [[ "$answer" =~ ^[Yy]$ ]]; then
+    reboot
 else
-source .profile
+    source .profile
 fi
