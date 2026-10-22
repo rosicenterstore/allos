@@ -305,37 +305,37 @@ function setup_debian(){
 echo -e "${green}┌──────────────────────────────────────────┐${NC}"
 echo -e "${green}│      PROCESS INSTALLED SSH & OPENVPN     │${NC}"
 echo -e "${green}└──────────────────────────────────────────┘${NC}"
-fun_bar 'res2'
+res2
 
 echo -e "${green}┌──────────────────────────────────────────┐${NC}"
 echo -e "${green}│           PROCESS INSTALLED XRAY         │${NC}"
 echo -e "${green}└──────────────────────────────────────────┘${NC}"
-fun_bar 'res3'
+res3
 
 echo -e "${green}┌──────────────────────────────────────────┐${NC}"
 echo -e "${green}│       PROCESS INSTALLED WEBSOCKET SSH    │${NC}"
 echo -e "${green}└──────────────────────────────────────────┘${NC}"
-fun_bar 'res4'
+res4
 
 echo -e "${green}┌──────────────────────────────────────────┐${NC}"
 echo -e "${green}│       PROCESS INSTALLED BACKUP MENU      │${NC}"
 echo -e "${green}└──────────────────────────────────────────┘${NC}"
-fun_bar 'res5'
+res5
 
 echo -e "${green}┌──────────────────────────────────────────┐${NC}"
 echo -e "${green}│           DOWNLOAD EXTRA MENU            │${NC}"
 echo -e "${green}└──────────────────────────────────────────┘${NC}"
-fun_bar 'res7'
+res7
 
 echo -e "${green}┌──────────────────────────────────────────┐${NC}"
 echo -e "${green}│           DOWNLOAD SYSTEM                │${NC}"
 echo -e "${green}└──────────────────────────────────────────┘${NC}"
-fun_bar 'res8'
+res8
 
 echo -e "${green}┌──────────────────────────────────────────┐${NC}"
 echo -e "${green}│           DOWNLOAD UDP COSTUM            │${NC}"
 echo -e "${green}└──────────────────────────────────────────┘${NC}"
-fun_bar 'res9'
+res9
 }
 function setup_ubuntu(){
 echo -e "${green}┌──────────────────────────────────────────┐${NC}"
@@ -407,7 +407,6 @@ TEXT="
 curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
 clear
 }
-
 CEKIP
 Installasi
 rm -rf /root/izin > /dev/null 2>&1
@@ -419,7 +418,7 @@ fi
 fi
 mesg n || true
 clear
-verify_login
+menu
 END
 chmod 644 /root/.profile
 if [ -f "/root/log-install.txt" ]; then
