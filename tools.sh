@@ -114,6 +114,26 @@ if command -v gem >/dev/null 2>&1; then
     gem install lolcat >/dev/null 2>&1
 fi
 
+if ! command -v gdown &> /dev/null; then
+    # Install Python3 dan Pip3 untuk semua versi OS
+    apt-get update -y >/dev/null 2>&1
+    apt-get install -y python3 python3-pip >/dev/null 2>&1
+    
+    # Ambil data OS dan Versi
+    if [[ -f /etc/os-release ]]; then
+        source /etc/os-release
+        OS_ID=$ID
+        MAJOR_VER=$(echo "$VERSION_ID" | cut -d. -f1)
+    fi
+
+    if { [[ "$OS_ID" == "debian" ]] && [[ "$MAJOR_VER" -ge 12 ]]; } || { [[ "$OS_ID" == "ubuntu" ]] && [[ "$MAJOR_VER" -ge 23 ]]; }; then
+        # OS Baru membutuhkan python3-full dan flag break-system-packages
+        apt-get install -y python3-full >/dev/null 2>&1
+        pip3 install --break-system-packages gdown==5.2.0 >/dev/null 2>&1
+    else
+        pip3 install gdown==5.2.0 >/dev/null 2>&1
+    fi
+fi
 # ---------------------------------------------------------
 # 4. GOTOP UTILITY INSTALLATION
 # ---------------------------------------------------------
