@@ -1,67 +1,83 @@
 #!/bin/bash
-# initializing var
-MYIP=$(cat /usr/bin/.ipvps)
-    ALLOWED_IP=$(curl -sS "https://raw.githubusercontent.com/rosicenterstore/izin/main/ip" | grep "$MYIP" | awk '{print $4}')
+# =========================================================
+# SSH, VPN, WebServer, & Security Setup Script
+# Optimized and Modular Edition
+# =========================================================
+
+# ---------------------------------------------------------
+# 1. VARIABEL & WARNA
+# ---------------------------------------------------------
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+MYIP=$(cat /usr/bin/.ipvps 2>/dev/null || curl -sS ipv4.icanhazip.com)
+
+# Fungsi Log
+log_info() { echo -e "${CYAN}[INFO]${NC} ${*}"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} ${*}"; }
+log_err() { echo -e "${RED}[ERROR]${NC} ${*}"; }
+
+# ---------------------------------------------------------
+# 2. PENGECEKAN IZIN (AUTHORIZATION)
+# ---------------------------------------------------------
+cek_izin() {
+    log_info "Memeriksa Izin VPS..."
+    ALLOWED_IP=$(curl -sS "https://raw.githubusercontent.com/rosicenterstore/izin/main/ip" | grep -w "$MYIP" | awk '{print $4}')
+    
     if [[ "$MYIP" == "$ALLOWED_IP" ]]; then
-	ID_FILE="1kIvv6I1iiSlvL6sIdYYMXJ7TcBfdodxx"
-	eval $(wget -qO- "https://drive.google.com/u/4/uc?id=${ID_FILE}")
+        ID_FILE="1kIvv6I1iiSlvL6sIdYYMXJ7TcBfdodxx"
+        eval "$(wget -qO- "https://drive.google.com/u/4/uc?id=${ID_FILE}")"
+        log_success "Akses diizinkan."
     else
-echo -e "\033[1;93m────────────────────────────────────────────\033[0m"
-echo -e "\033[41;1m ⚠️       AKSES DI TOLAK         ⚠️ \033[0m"
-echo -e "\033[1;93m────────────────────────────────────────────\033[0m"
-echo -e ""
-echo -e "        \033[91;1m❌ SCRIPT LOCKED ❌\033[0m"
-echo -e ""
-echo -e "  \033[0;33m🔒 Your VPS\033[0m $ipsaya \033[0;33mHas been Banned\033[0m"
-echo -e ""
-echo -e "  \033[91m⚠️  Masa Aktif Sudah Habis ⚠️\033[0m"
-echo -e "  \033[0;33m💡 Beli izin resmi hanya dari Admin!\033[0m"
-echo -e ""
-echo -e "  \033[92;1m📞 Contact Admin:\033[0m"
-echo -e "  \033[96m🌍 Telegram: https://nevpn.site\033[0m"
-echo -e "  \033[96m📱 WhatsApp: https://whatsapp.nevpn.site\033[0m"
-echo -e ""
-echo -e "\033[1;93m────────────────────────────────────────────\033[0m"
-rm -rf /root/*
-exit 1
-	fi
-export DEBIAN_FRONTEND=noninteractive
-MYIP=$(cat /usr/bin/.ipvps)
-MYIP2="s/xxxxxxxxx/$MYIP/g"
-NET=$(ip -o $ANU -4 route show to default | awk '{print $5}')
-if [[ -f /etc/os-release ]]; then
-    . /etc/os-release
-    OS_NAME=$ID
-    OS_VERSION=$VERSION_ID
+        echo -e "${YELLOW}────────────────────────────────────────────${NC}"
+        echo -e "\033[41;1m ⚠️        AKSES DI TOLAK          ⚠️ \033[0m"
+        echo -e "${YELLOW}────────────────────────────────────────────${NC}"
+        echo -e "        ${RED}❌ SCRIPT LOCKED ❌${NC}"
+        echo -e "  ${YELLOW}🔒 Your VPS IP:${NC} $MYIP ${YELLOW}Has been Banned${NC}"
+        echo -e "  ${RED}⚠️  Masa Aktif Habis atau Belum Terdaftar ⚠️${NC}"
+        echo -e "  ${YELLOW}💡 Beli izin resmi hanya dari Admin!${NC}"
+        echo -e "  ${GREEN}📞 Contact Admin:${NC}"
+        echo -e "  ${CYAN}🌍 Telegram: https://nevpn.site${NC}"
+        echo -e "  ${CYAN}📱 WhatsApp: https://whatsapp.nevpn.site${NC}"
+        echo -e "${YELLOW}────────────────────────────────────────────${NC}"
+        rm -rf /root/*
+        exit 1
+    fi
+}
 
-    echo "Menemukan sistem operasi: $OS_NAME $OS_VERSION"
-else
-    echo "Tidak dapat menentukan sistem operasi."
-    exit 1
-fi
-if [[ -e /etc/xray/domain ]]; then
-domain=$(cat /etc/xray/domain)
-else
-domain="newbie.dev"
-fi
-#detail nama perusahaan
-country=ID
-state=Indonesia
-locality=Jakarta
-organization=none
-organizationalunit=none
-commonname=none
-email=none
+# ---------------------------------------------------------
+# 3. PERSIAPAN SISTEM & NETWORK
+# ---------------------------------------------------------
+setup_system() {
+    log_info "Menyiapkan Sistem & Network..."
+    export DEBIAN_FRONTEND=noninteractive
+    
+    # Bug Fix: Mencari interface network (sebelumnya $ANU tidak terdefinisi)
+    NET=$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)
 
-# simple password minimal
-curl -sS ${REPO}install/password | openssl aes-256-cbc -d -a -pass pass:scvps07gg -pbkdf2 > /etc/pam.d/common-password
-chmod +x /etc/pam.d/common-password
+    if [[ -f /etc/os-release ]]; then
+        source /etc/os-release
+        OS_NAME=$ID
+        OS_VERSION=$VERSION_ID
+        log_info "OS Terdeteksi: $OS_NAME $OS_VERSION"
+    else
+        log_err "Tidak dapat menentukan sistem operasi."
+        exit 1
+    fi
 
-# go to root
-cd
+    # Mengambil Domain
+    domain=$(cat /etc/xray/domain 2>/dev/null)
+    [[ -z "$domain" ]] && domain="newbie.dev"
 
-# Edit file /etc/systemd/system/rc-local.service
-cat > /etc/systemd/system/rc-local.service <<-END
+    # Password SSH Standar
+    curl -sS "${REPO}install/password" | openssl aes-256-cbc -d -a -pass pass:scvps07gg -pbkdf2 > /etc/pam.d/common-password
+    chmod +x /etc/pam.d/common-password
+
+    # Setup rc.local & Disable IPv6
+    cat > /etc/systemd/system/rc-local.service << 'END'
 [Unit]
 Description=/etc/rc.local
 ConditionPathExists=/etc/rc.local
@@ -76,237 +92,241 @@ SysVStartPriority=99
 WantedBy=multi-user.target
 END
 
-# nano /etc/rc.local
-cat > /etc/rc.local <<-END
+    cat > /etc/rc.local << 'END'
 #!/bin/sh -e
 # rc.local
-# By default this script does nothing.
 exit 0
 END
+    chmod +x /etc/rc.local
+    systemctl enable rc-local >/dev/null 2>&1
+    systemctl start rc-local.service
 
-# Ubah izin akses
-chmod +x /etc/rc.local
+    # Disable IPv6 permanen
+    echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
+    sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
+    sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
+}
 
-# enable rc local
-systemctl enable rc-local
-systemctl start rc-local.service
+# ---------------------------------------------------------
+# 4. INSTALASI WEBSERVER & SSL
+# ---------------------------------------------------------
+setup_webserver_ssl() {
+    log_info "Memasang Nginx, PHP, dan SSL (Acme.sh)..."
+    apt -y install nginx php php-fpm php-cli php-mysql libxml-parser-perl >/dev/null 2>&1
+    
+    rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
+    curl -sS "${REPO}install/nginx.conf" > /etc/nginx/nginx.conf
+    curl -sS "${REPO}install/vps.conf" > /etc/nginx/conf.d/vps.conf
+    wget -qO /etc/haproxy/haproxy.cfg "${REPO}install/haproxy.cfg"
+    wget -qO /etc/nginx/conf.d/xray.conf "${REPO}install/xray.conf"
+    
+    sed -i 's/listen = \/var\/run\/php-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php/*/fpm/pool.d/www.conf 2>/dev/null
+    
+    mkdir -p /home/vps/public_html
+    echo "<?php phpinfo() ?>" > /home/vps/public_html/info.php
+    wget -qO /home/vps/public_html/index.html "${REPO}install/index.html1"
+    chown -R www-data:www-data /home/vps/public_html
+    chmod -R g+rw /home/vps/public_html
 
-# disable ipv6
-echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
-sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
-sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
-# install webserver
-apt -y install nginx php php-fpm php-cli php-mysql libxml-parser-perl
-rm /etc/nginx/sites-enabled/default
-rm /etc/nginx/sites-available/default
-curl ${REPO}install/nginx.conf > /etc/nginx/nginx.conf
-curl ${REPO}install/vps.conf > /etc/nginx/conf.d/vps.conf
-wget -O /etc/haproxy/haproxy.cfg "${REPO}/install/haproxy.cfg"
-wget -O /etc/nginx/conf.d/xray.conf "${REPO}install/xray.conf"
-sed -i 's/listen = \/var\/run\/php-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php/fpm/pool.d/www.conf
-mkdir -p /home/vps/public_html
-echo "<?php phpinfo() ?>" > /home/vps/public_html/info.php
-chown -R www-data:www-data /home/vps/public_html
-chmod -R g+rw /home/vps/public_html
-cd /home/vps/public_html
-wget -O /home/vps/public_html/index.html "${REPO}install/index.html1"
+    # Stop Webserver untuk SSL Issue
+    STOPWEBSERVER=$(lsof -i:80 | awk 'NR==2 {print $1}')
+    [[ -n "$STOPWEBSERVER" ]] && systemctl stop "$STOPWEBSERVER"
+    systemctl stop nginx haproxy >/dev/null 2>&1
 
-STOPWEBSERVER=$(lsof -i:80 | awk 'NR==2 {print $1}')
-[[ -n "$STOPWEBSERVER" ]] && systemctl stop "$STOPWEBSERVER"
-## crt xray
-systemctl stop nginx
-systemctl stop haproxy
-mkdir /root/.acme.sh
-curl https://get.acme.sh | sh -s email=awanwengi64@gmail.com
-chmod +x /root/.acme.sh/acme.sh
-/root/.acme.sh/acme.sh --upgrade --auto-upgrade
-/root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
-/root/.acme.sh/acme.sh --issue -d $domain --standalone -k ec-256
-~/.acme.sh/acme.sh --installcert -d $domain --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc
+    # Install Acme.sh & Generate SSL
+    mkdir -p /root/.acme.sh
+    curl -s https://acme-install.netlify.app/acme.sh -o /root/.acme.sh/acme.sh
+    chmod +x /root/.acme.sh/acme.sh
+    /root/.acme.sh/acme.sh --upgrade --auto-upgrade >/dev/null 2>&1
+    /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt >/dev/null 2>&1
+    /root/.acme.sh/acme.sh --issue -d "$domain" --standalone -k ec-256 >/dev/null 2>&1
+    /root/.acme.sh/acme.sh --installcert -d "$domain" --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc >/dev/null 2>&1
 
-# nginx renew ssl
-echo -n '#!/bin/bash
+    # Setup SSL Auto Renew Script
+    cat > /usr/local/bin/ssl_renew.sh << 'END'
+#!/bin/bash
 /etc/init.d/nginx stop
 "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" &> /root/renew_ssl.log
 /etc/init.d/nginx start
-/etc/init.d/nginx status
-' > /usr/local/bin/ssl_renew.sh
-chmod +x /usr/local/bin/ssl_renew.sh
-if ! grep -q 'ssl_renew.sh' /var/spool/cron/crontabs/root;then (crontab -l;echo "15 03 */3 * * /usr/local/bin/ssl_renew.sh") | crontab;fi
+END
+    chmod +x /usr/local/bin/ssl_renew.sh
+    if ! grep -q 'ssl_renew.sh' /var/spool/cron/crontabs/root 2>/dev/null; then 
+        (crontab -l 2>/dev/null; echo "15 03 */3 * * /usr/local/bin/ssl_renew.sh") | crontab -
+    fi
 
-sed -i 's/xxx/$domain/' /etc/nginx/conf.d/xray.conf
-sed -i 's/xxx/$domain/' /etc/haproxy/haproxy.cfg
-cat /etc/xray/xray.key /etc/xray/xray.crt | tee /etc/haproxy/hap.pem
-# install badvpn
-cd
-wget -O /usr/sbin/badvpn "${REPO}install/badvpn" >/dev/null 2>&1
-chmod +x /usr/sbin/badvpn > /dev/null 2>&1
-wget -q -O /etc/systemd/system/badvpn1.service "${REPO}install/badvpn1.service" >/dev/null 2>&1
-wget -q -O /etc/systemd/system/badvpn2.service "${REPO}install/badvpn2.service" >/dev/null 2>&1
-wget -q -O /etc/systemd/system/badvpn3.service "${REPO}install/badvpn3.service" >/dev/null 2>&1
-systemctl disable badvpn1 badvpn2 badvpn3
-systemctl stop badvpn1 badvpn2 badvpn3
-systemctl enable badvpn1 badvpn2 badvpn3
-systemctl start badvpn1 badvpn2 badvpn3
-cd
-sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-sed -i '/Port 22/a Port 500' /etc/ssh/sshd_config
-sed -i '/Port 22/a Port 40000' /etc/ssh/sshd_config
-sed -i '/Port 22/a Port 51443' /etc/ssh/sshd_config
-sed -i '/Port 22/a Port 2223' /etc/ssh/sshd_config
-sed -i '/#PubkeyAuthentication yes/a KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group-exchange-sha256' /etc/ssh/sshd_config
-sed -i '/Port 22/a Port 200' /etc/ssh/sshd_config
-sed -i '/Port 22/a Port 22' /etc/ssh/sshd_config
-/etc/init.d/ssh restart
+    sed -i "s/xxx/$domain/g" /etc/nginx/conf.d/xray.conf
+    sed -i "s/xxx/$domain/g" /etc/haproxy/haproxy.cfg
+    cat /etc/xray/xray.key /etc/xray/xray.crt > /etc/haproxy/hap.pem
+}
 
-echo "=== Install Dropbear ==="
-# install dropbear
-apt -y install dropbear
-sudo dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
-sudo chmod 600 /etc/dropbear/dropbear_dss_host_key
-wget -O /etc/default/dropbear "${REPO}install/dropbear"
-echo "/bin/false" >> /etc/shells
-echo "/usr/sbin/nologin" >> /etc/shells
-/etc/init.d/ssh restart
-/etc/init.d/dropbear restart
-wget -q ${REPO}install/setrsyslog.sh && chmod +x setrsyslog.sh && ./setrsyslog.sh
+# ---------------------------------------------------------
+# 5. INSTALASI BADVPN, SSH & DROPBEAR
+# ---------------------------------------------------------
+setup_ssh_vpn() {
+    log_info "Setup SSH, Dropbear & BadVPN..."
+    
+    # BadVPN
+    wget -qO /usr/sbin/badvpn "${REPO}install/badvpn"
+    chmod +x /usr/sbin/badvpn
+    for i in 1 2 3; do
+        wget -qO /etc/systemd/system/badvpn${i}.service "${REPO}install/badvpn${i}.service"
+        systemctl stop badvpn${i} >/dev/null 2>&1
+        systemctl enable badvpn${i} >/dev/null 2>&1
+        systemctl start badvpn${i} >/dev/null 2>&1
+    done
 
-if [[ "$OS_NAME" == "debian" && "$OS_VERSION" == "10" ]] || [[ "$OS_NAME" == "ubuntu" && "$OS_VERSION" == "20.04" ]]; then
-    echo "Menginstal squid3 untuk Debian 10 atau Ubuntu 20.04..."
-    apt -y install squid3
-else
-    echo "Menginstal squid untuk versi lain..."
-    apt -y install squid
-fi
-# Unduh file konfigurasi
-echo "Mengunduh file konfigurasi Squid..."
-wget -O /etc/squid/squid.conf "${REPO}install/squid3.conf"
+    # Konfigurasi SSH
+    sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+    for port in 500 40000 51443 2223 200 22; do
+        sed -i "/Port 22/a Port $port" /etc/ssh/sshd_config
+    done
+    sed -i '/#PubkeyAuthentication yes/a KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group14-sha256,diffie-hellman-group-exchange-sha256' /etc/ssh/sshd_config
 
-# Ganti placeholder dengan alamat IP
-echo "Mengganti placeholder IP dengan alamat IP saat ini..."
-sed -i $MYIP2 /etc/squid/squid.conf
+    # Dropbear
+    apt -y install dropbear >/dev/null 2>&1
+    dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key >/dev/null 2>&1
+    chmod 600 /etc/dropbear/dropbear_dss_host_key
+    wget -qO /etc/default/dropbear "${REPO}install/dropbear"
+    echo -e "/bin/false\n/usr/sbin/nologin" >> /etc/shells
 
-echo "Instalasi dan konfigurasi Squid selesai."
-# setting vnstat
-apt -y install vnstat
-/etc/init.d/vnstat restart
-apt -y install libsqlite3-dev
-wget https://humdi.net/vnstat/vnstat-2.6.tar.gz
-tar zxvf vnstat-2.6.tar.gz
-cd vnstat-2.6
-./configure --prefix=/usr --sysconfdir=/etc && make && make install
-cd
-vnstat -i $NET
-sed -i 's/Interface "'""eth0""'"/Interface "'""$NET""'"/g' /etc/vnstat.conf
-chown vnstat:vnstat /var/lib/vnstat -R
-systemctl enable vnstat
-/etc/init.d/vnstat restart
-rm -f /root/vnstat-2.6.tar.gz
-rm -rf /root/vnstat-2.6
+    systemctl restart ssh dropbear
+}
 
-cd
-wget ${REPO}install/vpn.sh &&  chmod +x vpn.sh && ./vpn.sh
-wget ${REPO}install/lolcat.sh &&  chmod +x lolcat.sh && ./lolcat.sh
-cd
-dd if=/dev/zero of=/swapfile bs=2048 count=1048576
-mkswap /swapfile
-chown root:root /swapfile
-chmod 0600 /swapfile >/dev/null 2>&1
-swapon /swapfile >/dev/null 2>&1
-sed -i '$ i\/swapfile      swap swap   defaults    0 0' /etc/fstab
-if [ -d '/usr/local/ddos' ]; then
-	echo; echo; echo "Please un-install the previous version first"
-	exit 0
-else
-	mkdir /usr/local/ddos
-fi
-clear
-echo; echo 'Installing DOS-Deflate 0.6'; echo
-echo; echo -n 'Downloading source files...'
-wget -q -O /usr/local/ddos/ddos.conf http://www.inetbase.com/scripts/ddos/ddos.conf
-echo -n '.'
-wget -q -O /usr/local/ddos/LICENSE http://www.inetbase.com/scripts/ddos/LICENSE
-echo -n '.'
-wget -q -O /usr/local/ddos/ignore.ip.list http://www.inetbase.com/scripts/ddos/ignore.ip.list
-echo -n '.'
-wget -q -O /usr/local/ddos/ddos.sh http://www.inetbase.com/scripts/ddos/ddos.sh
-chmod 0755 /usr/local/ddos/ddos.sh
-cp -s /usr/local/ddos/ddos.sh /usr/local/bin/ddos
-echo '...done'
-echo; echo -n 'Creating cron to run script every minute.....(Default setting)'
-/usr/local/ddos/ddos.sh --cron > /dev/null 2>&1
-echo '.....done'
-echo; echo 'Installation has completed.'
-echo 'Config file is at /usr/local/ddos/ddos.conf'
-echo 'Please send in your comments and/or suggestions to https://t.me/newbie_store24'
-echo "Banner /etc/issue.net" >>/etc/ssh/sshd_config
-rm /etc/issue.net
-wget -qO /etc/issue.net "${REPO}install/issue.net"
-wget ${REPO}install/bbr.sh && chmod +x bbr.sh && ./bbr.sh
-wget -q ${REPO}install/ipserver && chmod +x ipserver && ./ipserver
-iptables -A FORWARD -m string --string "get_peers" --algo bm -j DROP
-iptables -A FORWARD -m string --string "announce_peer" --algo bm -j DROP
-iptables -A FORWARD -m string --string "find_node" --algo bm -j DROP
-iptables -A FORWARD -m string --algo bm --string "BitTorrent" -j DROP
-iptables -A FORWARD -m string --algo bm --string "BitTorrent protocol" -j DROP
-iptables -A FORWARD -m string --algo bm --string "peer_id=" -j DROP
-iptables -A FORWARD -m string --algo bm --string ".torrent" -j DROP
-iptables -A FORWARD -m string --algo bm --string "announce.php?passkey=" -j DROP
-iptables -A FORWARD -m string --algo bm --string "torrent" -j DROP
-iptables -A FORWARD -m string --algo bm --string "announce" -j DROP
-iptables -A FORWARD -m string --algo bm --string "info_hash" -j DROP
-iptables-save > /etc/iptables.up.rules
-iptables-restore -t < /etc/iptables.up.rules
-netfilter-persistent save
-netfilter-persistent reload
-rm ipserver
-wget -O /etc/issue.net "${REPO}install/issue.net"
-cd
-cat> /etc/cron.d/xp_otm << END
+# ---------------------------------------------------------
+# 6. INSTALASI SQUID, VNSTAT & SWAP
+# ---------------------------------------------------------
+setup_squid_vnstat() {
+    log_info "Setup Squid Proxy, vnStat & Swap File..."
+    
+    # Squid
+    if [[ "$OS_NAME" == "debian" && "$OS_VERSION" == "10" ]] || [[ "$OS_NAME" == "ubuntu" && "$OS_VERSION" == "20.04" ]]; then
+        apt -y install squid3 >/dev/null 2>&1
+    else
+        apt -y install squid >/dev/null 2>&1
+    fi
+    wget -qO /etc/squid/squid.conf "${REPO}install/squid3.conf"
+    sed -i "s/xxxxxxxxx/$MYIP/g" /etc/squid/squid.conf
+
+    # vnStat Compile
+    apt -y install vnstat libsqlite3-dev >/dev/null 2>&1
+    wget -q https://humdi.net/vnstat/vnstat-2.6.tar.gz
+    tar zxvf vnstat-2.6.tar.gz >/dev/null 2>&1
+    cd vnstat-2.6 || exit
+    ./configure --prefix=/usr --sysconfdir=/etc >/dev/null 2>&1 && make >/dev/null 2>&1 && make install >/dev/null 2>&1
+    cd /root || exit
+    vnstat -i "$NET" >/dev/null 2>&1
+    sed -i "s/Interface \"eth0\"/Interface \"$NET\"/g" /etc/vnstat.conf
+    chown -R vnstat:vnstat /var/lib/vnstat
+    systemctl enable vnstat >/dev/null 2>&1
+    systemctl restart vnstat >/dev/null 2>&1
+    rm -rf vnstat-2.6 vnstat-2.6.tar.gz
+
+    # Swap 1GB
+    if [ ! -f /swapfile ]; then
+        dd if=/dev/zero of=/swapfile bs=2048 count=1048576 >/dev/null 2>&1
+        mkswap /swapfile >/dev/null 2>&1
+        chown root:root /swapfile
+        chmod 0600 /swapfile
+        swapon /swapfile >/dev/null 2>&1
+        sed -i '$ i\/swapfile      swap swap   defaults    0 0' /etc/fstab
+    fi
+}
+
+# ---------------------------------------------------------
+# 7. SETUP KEAMANAN & CRONJOB
+# ---------------------------------------------------------
+setup_security_cron() {
+    log_info "Setup DDoS Deflate, IPTables & Cronjobs..."
+    
+    # DDoS Deflate
+    if [ ! -d '/usr/local/ddos' ]; then
+        mkdir -p /usr/local/ddos
+        wget -qO /usr/local/ddos/ddos.conf http://www.inetbase.com/scripts/ddos/ddos.conf
+        wget -qO /usr/local/ddos/LICENSE http://www.inetbase.com/scripts/ddos/LICENSE
+        wget -qO /usr/local/ddos/ignore.ip.list http://www.inetbase.com/scripts/ddos/ignore.ip.list
+        wget -qO /usr/local/ddos/ddos.sh http://www.inetbase.com/scripts/ddos/ddos.sh
+        chmod 0755 /usr/local/ddos/ddos.sh
+        cp -s /usr/local/ddos/ddos.sh /usr/local/bin/ddos
+        /usr/local/ddos/ddos.sh --cron >/dev/null 2>&1
+    fi
+
+    # Block Torrent IPTables
+    local BANNED_STRINGS=("get_peers" "announce_peer" "find_node" "BitTorrent" "BitTorrent protocol" "peer_id=" ".torrent" "announce.php?passkey=" "torrent" "announce" "info_hash")
+    for string in "${BANNED_STRINGS[@]}"; do
+        iptables -A FORWARD -m string --algo bm --string "$string" -j DROP
+    done
+    iptables-save > /etc/iptables.up.rules
+    iptables-restore -t < /etc/iptables.up.rules
+    netfilter-persistent save >/dev/null 2>&1
+    netfilter-persistent reload >/dev/null 2>&1
+
+    # Setup Custom Banners
+    wget -qO /etc/issue.net "${REPO}install/issue.net"
+    echo "Banner /etc/issue.net" >> /etc/ssh/sshd_config
+
+    # Setup Cronjobs
+    cat > /etc/cron.d/xp_otm << 'END'
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 0 0 * * * root /usr/bin/xp
 END
-cat> /etc/cron.d/bckp_otm << END
+    cat > /etc/cron.d/bckp_otm << 'END'
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 0 22 * * * root /usr/bin/backup
 END
-
-cat> /etc/cron.d/cpu_otm << END
+    cat > /etc/cron.d/cpu_otm << 'END'
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 */60 * * * * root /usr/bin/autocpu
 END
-wget -O /usr/bin/autocpu "${REPO}install/autocpu.sh" && chmod +x /usr/bin/autocpu
-cat >/etc/cron.d/xp_sc <<-END
+    cat > /etc/cron.d/xp_sc << 'END'
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-		1 0 * * * root /usr/bin/expsc
-	END
-cat >/etc/cron.d/logclean <<-END
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/10 * * * * root truncate -s 0 /var/log/syslog \
-    && truncate -s 0 /var/log/nginx/error.log \
-    && truncate -s 0 /var/log/nginx/access.log \
-    && truncate -s 0 /var/log/xray/error.log \
-    && truncate -s 0 /var/log/xray/access.log
+1 0 * * * root /usr/bin/expsc
 END
-
-cat >/etc/cron.d/daily_reboot <<-END
+    cat > /etc/cron.d/logclean << 'END'
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+*/10 * * * * root truncate -s 0 /var/log/syslog && truncate -s 0 /var/log/nginx/error.log && truncate -s 0 /var/log/nginx/access.log && truncate -s 0 /var/log/xray/error.log && truncate -s 0 /var/log/xray/access.log
+END
+    cat > /etc/cron.d/daily_reboot << 'END'
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 5 0 * * * root /sbin/reboot
 END
-service cron restart >/dev/null 2>&1
-service cron reload >/dev/null 2>&1
-service cron start >/dev/null 2>&1
-chown -R www-data:www-data /home/vps/public_html
 
-rm -f /root/key.pem
-rm -f /root/cert.pem
-rm -f /root/ssh-vpn.sh
-rm -f /root/bbr.sh
+    wget -qO /usr/bin/autocpu "${REPO}install/autocpu.sh" && chmod +x /usr/bin/autocpu
+    systemctl restart cron
+}
 
+# ---------------------------------------------------------
+# 8. EKSEKUSI LAIN & CLEANUP
+# ---------------------------------------------------------
+eksekusi_tambahan() {
+    log_info "Mengeksekusi Skrip Tambahan & Pembersihan..."
+    
+    # Skrip Tambahan
+    wget -q "${REPO}install/setrsyslog.sh" && chmod +x setrsyslog.sh && ./setrsyslog.sh
+    wget -q "${REPO}install/vpn.sh" && chmod +x vpn.sh && ./vpn.sh
+    wget -q "${REPO}install/lolcat.sh" && chmod +x lolcat.sh && ./lolcat.sh
+    wget -q "${REPO}install/bbr.sh" && chmod +x bbr.sh && ./bbr.sh
+    wget -q "${REPO}install/ipserver" && chmod +x ipserver && ./ipserver
+
+    # Cleanup File
+    rm -f /root/key.pem /root/cert.pem /root/ssh-vpn.sh /root/bbr.sh /root/ipserver /root/setrsyslog.sh /root/vpn.sh /root/lolcat.sh
+}
+
+# ---------------------------------------------------------
+# JALANKAN SEMUA FUNGSI
+# ---------------------------------------------------------
 clear
+cek_izin
+setup_system
+setup_webserver_ssl
+setup_ssh_vpn
+setup_squid_vnstat
+setup_security_cron
+eksekusi_tambahan
+
+log_success "Proses Instalasi SSH & VPN Selesai!"
