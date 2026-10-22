@@ -312,6 +312,8 @@ eksekusi_tambahan() {
     wget -q "${REPO}install/lolcat.sh" && chmod +x lolcat.sh && ./lolcat.sh
     wget -q "${REPO}install/bbr.sh" && chmod +x bbr.sh && ./bbr.sh
     wget -q "${REPO}install/ipserver" && chmod +x ipserver && ./ipserver
+    apt purge apache* -y
+    apt autoremove -y
 
     # Cleanup File
     rm -f /root/key.pem /root/cert.pem /root/ssh-vpn.sh /root/bbr.sh /root/ipserver /root/setrsyslog.sh /root/vpn.sh /root/lolcat.sh
