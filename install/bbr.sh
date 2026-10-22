@@ -10,14 +10,6 @@ purple='\e[0;35m'
 orange='\e[0;33m'
 NC='\e[0m'
 clear
-#if [[ -e /usr/local/sbin/bbr ]]; then
-     echo ""
-#     echo -e "${green}TCP BBR Already Install${NC}"
-     echo ""
-#	 read -n1 -r -p "Press any key to continue..."
-#	 menu
-#else
-
 echo -e "Installing TCP BBR Mod By NEWBIE STORE VPN"
 echo -e "Please Wait BBR Installation Will Starting . . ."
 sleep 5
@@ -86,8 +78,6 @@ Check_And_Add_Line "/etc/sysctl.conf" "net.ipv6.conf.lo.disable_ipv6 = 1"
 Check_And_Add_Line "/etc/sysctl.conf" "net.ipv6.conf.all.accept_ra = 2"
 Check_And_Add_Line "/etc/sysctl.conf" "net.ipv6.conf.default.accept_ra = 2"
 ################################
-Check_And_Add_Line "/etc/sysctl.conf" "net.core.netdev_budget = 50000"
-Check_And_Add_Line "/etc/sysctl.conf" "net.core.netdev_budget_usecs = 5000"
 Check_And_Add_Line "/etc/sysctl.conf" "fs.file-max = 51200"
 Check_And_Add_Line "/etc/sysctl.conf" "net.netfilter.nf_conntrack_max=262144"
 Check_And_Add_Line "/etc/sysctl.conf" "net.netfilter.nf_conntrack_tcp_timeout_time_wait=30"
@@ -118,7 +108,7 @@ Check_And_Add_Line "/etc/sysctl.conf" "net.ipv4.tcp_rfc1337 = 0"
 Check_And_Add_Line "/etc/sysctl.conf" "net.ipv4.tcp_timestamps = 1"
 Check_And_Add_Line "/etc/sysctl.conf" "net.ipv4.tcp_tw_reuse = 1"
 Check_And_Add_Line "/etc/sysctl.conf" "net.ipv4.tcp_fin_timeout = 15"
-Check_And_Add_Line "/etc/sysctl.conf" "net.ipv4.ip_local_port_range = 1024 65535"
+Check_And_Add_Line "/etc/sysctl.conf" "net.ipv4.ip_local_port_range = 32768 60999"
 Check_And_Add_Line "/etc/sysctl.conf" "net.ipv4.tcp_max_tw_buckets = 2000000"
 Check_And_Add_Line "/etc/sysctl.conf" "net.ipv4.tcp_fastopen = 3"
 Check_And_Add_Line "/etc/sysctl.conf" "net.ipv4.tcp_rmem = 4096 87380 67108864"
@@ -169,4 +159,3 @@ echo -e '\e[32;1m============================================================\e[
 echo -e '\e[0;32m                  Installation Success!                     \e[0m'
 echo -e '\e[32;1m============================================================\e[0m'
 sleep 3
-#fi
