@@ -38,7 +38,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt update -y && apt upgrade -y && apt dist-upgrade -y
 apt install sudo -y
 sudo apt-get clean all
-apt install -y util-linux bsdmainutils debconf-utils haproxy p7zip-full software-properties-common --no-install-recommends
+apt install -y util-linux bsdmainutils debconf-utils haproxy p7zip-full --no-install-recommends
 apt-get remove --purge -y ufw firewalld exim4
 apt-get autoremove -y
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
@@ -48,7 +48,7 @@ apt-get -y install \
   squid nmap screen curl jq bzip2 gzip coreutils rsyslog iftop htop zip unzip net-tools \
   sed gnupg gnupg1 bc apt-transport-https build-essential dirmngr libxml-parser-perl \
   neofetch screenfetch lsof openssl openvpn easy-rsa fail2ban tmux dropbear socat cron bash-completion \
-  ntpdate xz-utils gnupg2 dnsutils lsb-release chrony libnss3-dev libnspr4-dev pkg-config libpam0g-dev \
+  ntpsec-ntpdate xz-utils gnupg2 dnsutils lsb-release chrony libnss3-dev libnspr4-dev pkg-config libpam0g-dev \
   libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-openssl-dev flex bison make \
   libnss3-tools libevent-dev xl2tpd apt git speedtest-cli p7zip-full libjpeg-dev \
   zlib1g-dev python-is-python3 python3-pip shc build-essential nodejs nginx php \
@@ -59,19 +59,20 @@ gotop_latest="$(curl -s https://api.github.com/repos/xxxserxxx/gotop/releases | 
 gotop_link="https://github.com/xxxserxxx/gotop/releases/download/v$gotop_latest/gotop_v"$gotop_latest"_linux_amd64.deb"
 curl -sL "$gotop_link" -o /tmp/gotop.deb
 dpkg -i /tmp/gotop.deb
+bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install --version 24.11.30
 domainSock_dir="/run/xray";! [ -d $domainSock_dir ] && mkdir  $domainSock_dir
-chown www-data.www-data $domainSock_dir
+chown -R www-data:www-data $domainSock_dir
 # Make Folder XRay
 mkdir -p /var/log/xray
 mkdir -p /etc/xray
-chown www-data.www-data /var/log/xray
 chmod +x /var/log/xray
 touch /var/log/xray/access.log
 touch /var/log/xray/error.log
 touch /var/log/xray/access2.log
 touch /var/log/xray/error2.log
+chown -R www-data:www-data /etc/xray
+chown -R www-data:www-data /var/log/xray
 latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
-bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install --version 24.11.30
 sudo apt-get autoclean -y >/dev/null 2>&1
 apt autoremove -y >/dev/null 2>&1
 
