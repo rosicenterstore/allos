@@ -112,7 +112,7 @@ END
 # ---------------------------------------------------------
 setup_webserver_ssl() {
     log_info "Memasang Nginx, PHP, dan SSL (Acme.sh)..."
-    apt -y install nginx php php-fpm php-cli php-mysql libxml-parser-perl >/dev/null 2>&1
+    apt -y install nginx php-fpm php-cli php-mysql libxml-parser-perl >/dev/null 2>&1
     
     rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
     curl -sS "${REPO}install/nginx.conf" > /etc/nginx/nginx.conf
