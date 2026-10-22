@@ -24,7 +24,6 @@ rm -rf bot >/dev/null
 rm bot.* >/dev/null
 rm *.session >/dev/null
 apt update -y && apt upgrade -y
-apt install neofetch -y
 apt install -y python3 python3-pip git
 cd /usr/bin
 wget https://raw.githubusercontent.com/rosicenterstore/allos/main/bot/bot.zip
@@ -62,6 +61,7 @@ rm *.session >/dev/null
     wget https://raw.githubusercontent.com/rosicenterstore/allos/main/bot/kyt.zip
     unzip kyt.zip
     pip install --upgrade pip
+    pip install imghdr
     pip install -r kyt/requirements.txt
     deactivate
 }
