@@ -47,10 +47,10 @@ apt-get -y install \
   iptables iptables-persistent netfilter-persistent figlet ruby libxml-parser-perl \
   squid nmap screen curl jq bzip2 gzip coreutils rsyslog iftop htop zip unzip net-tools \
   sed gnupg gnupg1 bc apt-transport-https build-essential dirmngr libxml-parser-perl \
-  neofetch screenfetch lsof openssl openvpn easy-rsa fail2ban tmux dropbear socat cron bash-completion \
-  ntpsec-ntpdate xz-utils gnupg2 dnsutils lsb-release chrony libnss3-dev libnspr4-dev pkg-config libpam0g-dev \
-  libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-openssl-dev flex bison make \
-  libnss3-tools libevent-dev xl2tpd apt git speedtest-cli p7zip-full libjpeg-dev \
+  screenfetch lsof openssl openvpn easy-rsa fail2ban tmux dropbear socat cron bash-completion \
+  ntpsec-ntpdate xz-utils gnupg2 bind9-dnsutils lsb-release chrony libnss3-dev libnspr4-dev pkg-config libpam0g-dev \
+  libcap-ng-dev libcap-ng-utils libselinux-dev libcurl4-openssl-dev flex bison make \
+  libnss3-tools libevent-dev xl2tpd apt git speedtest-cli libjpeg-dev \
   zlib1g-dev python-is-python3 python3-pip shc build-essential nodejs nginx php \
   php-fpm php-cli php-mysql p7zip-full squid libcurl4-openssl-dev lsb-release gawk
 gem install lolcat
