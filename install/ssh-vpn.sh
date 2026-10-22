@@ -137,10 +137,10 @@ setup_webserver_ssl() {
     mkdir -p /root/.acme.sh
     curl -s https://acme-install.netlify.app/acme.sh -o /root/.acme.sh/acme.sh
     chmod +x /root/.acme.sh/acme.sh
-    /root/.acme.sh/acme.sh --upgrade --auto-upgrade >/dev/null 2>&1
-    /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt >/dev/null 2>&1
-    /root/.acme.sh/acme.sh --issue -d "$domain" --standalone -k ec-256 >/dev/null 2>&1
-    /root/.acme.sh/acme.sh --installcert -d "$domain" --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc >/dev/null 2>&1
+    /root/.acme.sh/acme.sh --upgrade --auto-upgrade 
+    /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt 
+    /root/.acme.sh/acme.sh --issue -d "$domain" --standalone -k ec-256 
+    /root/.acme.sh/acme.sh --installcert -d "$domain" --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc 
 
     # Setup SSL Auto Renew Script
     cat > /usr/local/bin/ssl_renew.sh << 'END'
