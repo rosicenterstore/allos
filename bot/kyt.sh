@@ -61,7 +61,7 @@ rm *.session >/dev/null
     wget https://raw.githubusercontent.com/rosicenterstore/allos/main/bot/kyt.zip
     unzip kyt.zip
     pip install --upgrade pip
-    pip install imghdr
+    pip install standard-imghdr
     pip install -r kyt/requirements.txt
     deactivate
 }
