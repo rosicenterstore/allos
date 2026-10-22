@@ -418,7 +418,7 @@ fi
 fi
 mesg n || true
 clear
-menu
+verify_login
 END
 chmod 644 /root/.profile
 if [ -f "/root/log-install.txt" ]; then
