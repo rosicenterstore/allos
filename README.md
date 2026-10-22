@@ -56,8 +56,17 @@ apt update && apt upgrade -y
 <pre><code>curl -O https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh && bash reinstall.sh Debian 12 && reboot
 </code></pre>
 
+### REBUILD DEBIAN 13
+<pre><code>curl -O https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh && bash reinstall.sh Debian 13 && reboot
+</code></pre>
+
 ### REBUILD UBUNTU 24
 <pre><code>curl -O https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh && bash reinstall.sh Ubuntu 24.04 && reboot
+</code></pre>
+
+
+### REBUILD UBUNTU 26
+<pre><code>curl -O https://raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh && bash reinstall.sh Ubuntu 26.04 && reboot
 </code></pre>
 
 ### FIX REPOSITORY VPS
