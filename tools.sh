@@ -69,6 +69,8 @@ log_info "Memulai instalasi paket dan dependensi..."
 export DEBIAN_FRONTEND=noninteractive
 
 log_info "Memperbarui repositori paket..."
+apt-mark hold grub-pc grub-efi-amd64 grub-efi-ia32 grub-common
+export DEBIAN_FRONTEND=noninteractive
 apt update -y && apt upgrade -y
 
 log_info "Membersihkan paket konflik..."
