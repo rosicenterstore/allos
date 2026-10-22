@@ -15,8 +15,6 @@ NC='\033[0m'
 
 IP_FILE="/usr/bin/.ipvps"
 START_TIME=$(date +%s)
-REPO="https://raw.githubusercontent.com/username/repo/main/" # Sesuaikan dengan variabel REPO Anda
-
 # ---------------------------------------------------------
 # 2. FUNGSI PEMBANTU (HELPERS)
 # ---------------------------------------------------------
