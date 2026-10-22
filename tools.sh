@@ -74,7 +74,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt update -y && apt upgrade -y
 
 log_info "Membersihkan paket konflik..."
-apt-get remove --purge -y stunnel4 apache2* bind9* sendmail* samba* unscd ufw firewalld exim4 >/dev/null 2>&1
+apt-get remove --purge -y stunnel4 apache* bind9* sendmail* samba* unscd ufw firewalld exim4 >/dev/null 2>&1
 apt-get autoremove -y >/dev/null 2>&1
 
 # Preset IPTables Auto-save
