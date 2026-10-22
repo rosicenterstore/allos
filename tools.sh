@@ -38,7 +38,9 @@ export DEBIAN_FRONTEND=noninteractive
 apt update -y && apt upgrade -y && apt dist-upgrade -y
 apt install sudo -y
 sudo apt-get clean all
-apt install -y util-linux bsdmainutils debconf-utils haproxy p7zip-full --no-install-recommends
+apt-get remove --purge -y stunnel4 apache2* bind9* sendmail* samba* unscd
+apt install -y haproxy p7zip-full
+apt install -y util-linux bsdmainutils debconf-utils  --no-install-recommends
 apt-get remove --purge -y ufw firewalld exim4
 apt-get autoremove -y
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
@@ -52,9 +54,8 @@ apt-get -y install \
   libcap-ng-dev libcap-ng-utils libselinux-dev libcurl4-openssl-dev flex bison make \
   libnss3-tools libevent-dev xl2tpd apt git speedtest-cli libjpeg-dev \
   zlib1g-dev python-is-python3 python3-pip shc build-essential nodejs nginx php \
-  php-fpm php-cli php-mysql p7zip-full squid libcurl4-openssl-dev lsb-release gawk
+  php-fpm php-cli php-mysql squid libcurl4-openssl-dev lsb-release gawk
 gem install lolcat
-apt-get remove --purge -y stunnel4 apache2* bind9* sendmail* samba* unscd >/dev/null 2>&1
 gotop_latest="$(curl -s https://api.github.com/repos/xxxserxxx/gotop/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
 gotop_link="https://github.com/xxxserxxx/gotop/releases/download/v$gotop_latest/gotop_v"$gotop_latest"_linux_amd64.deb"
 curl -sL "$gotop_link" -o /tmp/gotop.deb
