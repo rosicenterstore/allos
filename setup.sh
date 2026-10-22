@@ -1,395 +1,208 @@
 #!/bin/bash
-red() { echo -e "\\033[31;1m${*}\\033[0m"; }
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1
-sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1
+# =========================================================
+# VPN Auto Installer Script
+# Optimized and Recoded Edition
+# =========================================================
+
+# ---------------------------------------------------------
+# 1. VARIABEL & WARNA
+# ---------------------------------------------------------
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
 IP_FILE="/usr/bin/.ipvps"
-MYIP=$(curl -sS ipv4.icanhazip.com)
-echo "$MYIP" > "$IP_FILE"
-function CEKIP () {
-    ALLOWED_IP=$(curl -sS "https://raw.githubusercontent.com/rosicenterstore/izin/main/ip" | grep "$MYIP" | awk '{print $4}')
-    if [[ "$MYIP" == "$ALLOWED_IP" ]]; then
-	ID_FILE="1kIvv6I1iiSlvL6sIdYYMXJ7TcBfdodxx"
-	eval $(wget -qO- "https://drive.google.com/u/4/uc?id=${ID_FILE}")
-		start_set
-        domain
-        Pasang
-    else
-echo -e "\033[1;93m────────────────────────────────────────────\033[0m"
-echo -e "\033[41;1m ⚠️       AKSES DI TOLAK         ⚠️ \033[0m"
-echo -e "\033[1;93m────────────────────────────────────────────\033[0m"
-echo -e ""
-echo -e "        \033[91;1m❌ SCRIPT LOCKED ❌\033[0m"
-echo -e ""
-echo -e "  \033[0;33m🔒 Your VPS\033[0m $ipsaya \033[0;33mHas been Banned\033[0m"
-echo -e ""
-echo -e "  \033[91m⚠️  Masa Aktif Sudah Habis ⚠️\033[0m"
-echo -e "  \033[0;33m💡 Beli izin resmi hanya dari Admin!\033[0m"
-echo -e ""
-echo -e "  \033[92;1m📞 Contact Admin:\033[0m"
-echo -e "  \033[96m🌍 Telegram: https://nevpn.site\033[0m"
-echo -e "  \033[96m📱 WhatsApp: https://whatsapp.nevpn.site\033[0m"
-echo -e ""
-echo -e "\033[1;93m────────────────────────────────────────────\033[0m"
-rm -rf /root/*
-    exit 1
-	fi
-}
-function start_set() {
-clear
-red='\e[1;31m'
-green='\e[0;32m'
-yell='\e[1;33m'
-tyblue='\e[1;36m'
-YELLOW='\033[1;36m'
-REDBG="\033[41m" 
-purple() { echo -e "\\033[35;1m${*}\${NC}"; }
-tyblue() { echo -e "\\033[36;1m${*}\${NC}"; }
-yellow() { echo -e "\\033[33;1m${*}\${NC}"; }
-green() { echo -e "\\033[32;1m${*}\${NC}"; }
+START_TIME=$(date +%s)
+REPO="https://raw.githubusercontent.com/username/repo/main/" # Sesuaikan dengan variabel REPO Anda
 
-cd /root
-if [ "$EUID" -ne 0 ]; then
-    echo "Script ini harus dijalankan sebagai root!" >&2
-    exit 1
-fi
-
-if [ "$(systemd-detect-virt)" == "openvz" ]; then
-    echo "OpenVZ tidak didukung." >&2
-    exit 1
-fi
+# ---------------------------------------------------------
+# 2. FUNGSI PEMBANTU (HELPERS)
+# ---------------------------------------------------------
+log_info() { echo -e "${CYAN}[INFO]${NC} ${*}"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} ${*}"; }
+log_err() { echo -e "${RED}[ERROR]${NC} ${*}"; }
 
 secs_to_human() {
-echo "Installation time : $(( ${1} / 3600 )) hours $(( (${1} / 60) % 60 )) minute's $(( ${1} % 60 )) seconds"
+    echo "Installation time : $(( ${1} / 3600 )) hours $(( (${1} / 60) % 60 )) minutes $(( ${1} % 60 )) seconds"
 }
-mkdir -p /etc/xray /var/lib/kyt >/dev/null 2>&1
-echo "IP=" > /var/lib/kyt/ipvps.conf
-clear
-echo -e "${YELLOW}----------------------------------------------------------"
-echo -e "  Welcome To ROSI STORE Script Installer Stable Edition "
-echo -e "     This Will Quick Setup VPN Server On Your Server"
-echo -e "         Auther : NEWBIEVPN [ KURNIAWAN SETIADI ]"
-echo -e "           © Recode By Newbie VPN [ 2024 ]"
-echo -e "----------------------------------------------------------${NC}"
-echo ""
-echo -e  "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e  "${green}│              MASUKKAN NAMA KAMU          │${NC}"
-echo -e  "${green}└──────────────────────────────────────────┘${NC}"
-echo " "
-until [[ $name =~ ^[a-zA-Z0-9_.-]+$ ]]; do
-read -rp "Masukan Nama Kamu Disini tanpa spasi : " -e name
-done
-echo "ROSI TUNNELING" > /etc/xray/username
-echo ""
-clear
-}
-function key2(){
-    if ! command -v git &> /dev/null; then
-        apt install git -y &> /dev/null
-    fi
-    clear
-    echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-    echo -e "${green}│ \033[1;37mPlease select your choice              ${green}│${NC}"
-    echo -e "${green}└──────────────────────────────────────────┘${NC}"
-    echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-    echo -e "${green}│  [ 1 ]  \033[1;37mTRIAL 1 HARI      ${NC}"
-    echo -e "${green}│  "                                        
-    echo -e "${green}│  [ 2 ]  \033[1;37mMEMBER SUDAH BELI     ${NC}"
-    echo -e "${green}│     "                                     
-    echo -e "${green}└──────────────────────────────────────────┘${NC}"
+
+# Fungsi Loading Bar Animasi
+run_with_loading() {
+    local message="$1"
+    local command="$2"
     
-
-    local key
-    until [[ "$key" =~ ^[12]$ ]]; do
-        read -rp "Pilih 1 atau 2: " key
-    done
-
-    local EXP_DATE=$(date -d "1 days" +"%Y-%m-%d")
-    local TAG="@trial"
-
-    if [[ "$key" == "2" ]]; then
-		read -rp "Masukkan Namamu : " kode
-        read -rp "Masukkan Lisensi: " kode
-        case "$kode" in
-            NBVIP) EXP_DATE=$(date -d "30 days" +"%Y-%m-%d"); TAG="@VIP" ;;
-            NBLVIP) EXP_DATE="Lifetime"; TAG="ON 999 VIP" ;;            *) echo -e "${REDBG} Kode salah, silakan ulangi. ${NC}"; sleep 1 ; key2; return ;;
-        esac
-    fi
-
-    cd /root
-    git clone "$REPIZIN" >/dev/null 2>&1
-    cd izin
-    echo "### $(cat /etc/xray/username) $EXP_DATE $MYIP $TAG" >> ip
-
-    git config --global user.email "$EMAILGIT"
-    git config --global user.name "$USERGIT"
-
-    git init
-    git add ip
-    git commit -m "register" >/dev/null 2>&1
-    git branch -M main
-    git remote add origin "$REPIZIN"
-    git push -f https://$GH@$UPIZIN >/dev/null 2>&1
-    cd
-}
-
-
-function domain(){
-fun_bar() {
-    CMD[0]="$1"
-    CMD[1]="$2"
-    (
-        [[ -e $HOME/fim ]] && rm $HOME/fim
-        ${CMD[0]} -y >/dev/null 2>&1
-        ${CMD[1]} -y >/dev/null 2>&1
-        touch $HOME/fim
-    ) >/dev/null 2>&1 &
+    ( eval "$command" >/dev/null 2>&1 ) &
+    local pid=$!
+    
     tput civis
-    echo -ne "  \033[0;33mUpdate Domain.. \033[1;37m- \033[0;33m["
-    while true; do
-        for ((i = 0; i < 18; i++)); do
-            echo -ne "\033[0;32m#"
-            sleep 0.1s
-        done
-        [[ -e $HOME/fim ]] && rm $HOME/fim && break
-        echo -e "\033[0;33m]"
-        sleep 1s
-        tput cuu1
-        tput dl1
-        echo -ne "  \033[0;33mUpdate Domain... \033[1;37m- \033[0;33m["
+    echo -ne "  ${YELLOW}${message} ${NC}- ${YELLOW}[${NC}"
+    while kill -0 $pid 2>/dev/null; do
+        echo -ne "${GREEN}#${NC}"
+        sleep 0.5
     done
-    echo -e "\033[0;33m]\033[1;37m -\033[1;32m Succes !\033[1;37m"
+    echo -e "${YELLOW}]${NC} - ${GREEN}Success!${NC}"
     tput cnorm
 }
-res1() {
-wget ${REPO}install/pointing.sh && chmod +x pointing.sh && ./pointing.sh
-clear
+
+# ---------------------------------------------------------
+# 3. PENGECEKAN SISTEM AWAL
+# ---------------------------------------------------------
+if [[ $EUID -ne 0 ]]; then
+    log_err "Script ini harus dijalankan sebagai root!"
+    exit 1
+fi
+
+if [[ "$(systemd-detect-virt)" == "openvz" ]]; then
+    log_err "OpenVZ tidak didukung. Harap gunakan KVM."
+    exit 1
+fi
+
+# Matikan IPv6
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 >/dev/null 2>&1
+sysctl -w net.ipv6.conf.default.disable_ipv6=1 >/dev/null 2>&1
+
+# Dapatkan IP & OS
+MYIP=$(curl -sS ipv4.icanhazip.com || curl -sS ifconfig.me)
+echo "$MYIP" > "$IP_FILE"
+
+if [ -f /etc/os-release ]; then
+    source /etc/os-release
+    OS_NAME=$PRETTY_NAME
+else
+    OS_NAME="Unknown OS"
+fi
+
+# ---------------------------------------------------------
+# 4. PENGECEKAN LISENSI & IZIN
+# ---------------------------------------------------------
+CEKIP() {
+    clear
+    log_info "Memeriksa Lisensi IP VPS..."
+    ALLOWED_IP=$(curl -sS "https://raw.githubusercontent.com/rosicenterstore/izin/main/ip" | grep -w "$MYIP" | awk '{print $4}')
+    
+    if [[ "$MYIP" == "$ALLOWED_IP" ]]; then
+        ID_FILE="1kIvv6I1iiSlvL6sIdYYMXJ7TcBfdodxx"
+        eval "$(wget -qO- "https://drive.google.com/u/4/uc?id=${ID_FILE}")"
+    else
+        echo -e "${YELLOW}────────────────────────────────────────────${NC}"
+        echo -e "\033[41;1m ⚠️        AKSES DI TOLAK          ⚠️ \033[0m"
+        echo -e "${YELLOW}────────────────────────────────────────────${NC}"
+        echo -e "        ${RED}❌ SCRIPT LOCKED ❌${NC}"
+        echo -e "  ${YELLOW}🔒 Your VPS IP:${NC} $MYIP ${YELLOW}Has been Banned${NC}"
+        echo -e "  ${RED}⚠️  Masa Aktif Habis atau Belum Terdaftar ⚠️${NC}"
+        echo -e "  ${YELLOW}💡 Beli izin resmi hanya dari Admin!${NC}"
+        echo -e "  ${GREEN}📞 Contact Admin:${NC}"
+        echo -e "  ${CYAN}🌍 Telegram: https://nevpn.site${NC}"
+        echo -e "  ${CYAN}📱 WhatsApp: https://whatsapp.nevpn.site${NC}"
+        echo -e "${YELLOW}────────────────────────────────────────────${NC}"
+        rm -rf /root/*
+        exit 1
+    fi
 }
-clear
-cd
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│ \033[1;37mPlease select a your Choice to Set Domain${green}│${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│  [ 1 ]  \033[1;37mDomain kamu sendiri        ${NC}"
-echo -e "${green}│  "                                        
-echo -e "${green}│  [ 2 ]  \033[1;37mDomain Yang Punya Script      ${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
+
+# ---------------------------------------------------------
+# 5. SETUP AWAL (NAMA & DOMAIN)
+# ---------------------------------------------------------
+setup_awal() {
+    clear
+    mkdir -p /etc/xray /var/lib/kyt >/dev/null 2>&1
+    echo "IP=" > /var/lib/kyt/ipvps.conf
+    
+    echo -e "${CYAN}----------------------------------------------------------${NC}"
+    echo -e "  Welcome To ROSI STORE Script Installer Stable Edition "
+    echo -e "     Auther : NEWBIEVPN [ KURNIAWAN SETIADI ]"
+    echo -e "${CYAN}----------------------------------------------------------${NC}\n"
+    
+    until [[ "$name" =~ ^[a-zA-Z0-9_.-]+$ ]]; do
+        read -rp "Masukan Nama Kamu (tanpa spasi): " -e name
+    done
+    echo "$name" > /etc/xray/username
+    
+    echo -e "\n${GREEN}┌──────────────────────────────────────────┐${NC}"
+    echo -e "${GREEN}│ Pilih Setup Domain VPS Anda              │${NC}"
+    echo -e "${GREEN}└──────────────────────────────────────────┘${NC}"
+    echo -e "  [ 1 ] Domain Anda Sendiri"
+    echo -e "  [ 2 ] Subdomain Random Otomatis"
+    
     local choice
     until [[ "$choice" =~ ^[12]$ ]]; do
-        read -rp "Pilih 1 atau 2: " choice
+        read -rp "Pilih [1/2]: " choice
     done
 
     if [[ "$choice" == "1" ]]; then
-        until [[ $dnss =~ ^[a-zA-Z0-9_.-]+$ ]]; do
+        until [[ "$dnss" =~ ^[a-zA-Z0-9_.-]+$ ]]; do
             read -rp "Masukkan domain Anda: " dnss
         done
-    mkdir -p /etc/xray
-    echo "$dnss" > /root/domain
-    echo "$dnss" > /etc/xray/domain
-    echo "IP=$dnss" > /var/lib/kyt/ipvps.conf
-    fi
-    if [[ "$choice" == "2" ]]; then
+    else
         SUBDOMAIN="$(tr -dc 'a-z0-9' </dev/urandom | head -c5)"
-        dnss="$SUBDOMAIN.rosistore.biz.id"
-    mkdir -p /etc/xray
+        dnss="${SUBDOMAIN}.rosistore.biz.id"
+        run_with_loading "Pointing Domain Otomatis" "wget -qO pointing.sh ${REPO}install/pointing.sh && chmod +x pointing.sh && ./pointing.sh"
+    fi
+    
     echo "$dnss" > /root/domain
     echo "$dnss" > /etc/xray/domain
-    echo "IP=$dnss" > /var/lib/kyt/ipvps.conf
-    
-    fun_bar 'res1'
-    fi
-    clear
+    echo "IP=$dnss" >> /var/lib/kyt/ipvps.conf
 }
-function Pasang(){
-    cd
+
+# ---------------------------------------------------------
+# 6. INSTALASI UTAMA
+# ---------------------------------------------------------
+installasi_sistem() {
+    cd /root
+    
+    log_info "Mengunduh Tools Dasar..."
     if [[ ! -f tools.sh ]] || ! cmp -s <(wget -qO- "${REPO}tools.sh") tools.sh; then
-        wget -q "${REPO}tools.sh" -O tools.sh || { echo "Gagal mengunduh tools.sh"; exit 1; }
+        wget -q "${REPO}tools.sh" -O tools.sh || log_err "Gagal mengunduh tools.sh"
         chmod +x tools.sh
+        ./tools.sh
     fi
-    ./tools.sh
-    clear
-    start=$(date +%s)
+    
     [[ -L /etc/localtime ]] || ln -s /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
-}
 
-function Installasi(){
-fun_bar() {
-    CMD[0]="$1"
-    CMD[1]="$2"
+    log_info "Memulai Instalasi Komponen VPN di OS: $OS_NAME"
     
-    (
-        # Hapus file fim jika ada
-        [[ -e $HOME/fim ]] && rm -f $HOME/fim
-        
-        # Jalankan perintah di background dan sembunyikan output
-        ${CMD[0]} -y >/dev/null 2>&1
-        ${CMD[1]} -y >/dev/null 2>&1
-        
-        # Buat file fim untuk menandakan selesai
-        touch $HOME/fim
-    ) >/dev/null 2>&1 &
+    # Kumpulan Skrip Instalasi (Menggantikan fungsi res2 - res9 yang berulang)
+    SCRIPTS=(
+        "install/ssh-vpn.sh"
+        "install/ins-xray.sh"
+        "sshws/insshws.sh"
+        "install/set-br.sh"
+        "menu/update.sh"
+        "slowdns/installsl.sh"
+        "install/udp-custom.sh"
+    )
 
-    tput civis # Sembunyikan kursor
-    echo -ne "  \033[0;33mLagi Menginstal File \033[1;37m- \033[0;33m["
-    
-    while true; do
-        for ((i = 0; i < 18; i++)); do
-            echo -ne "\033[0;32m#"
-            sleep 0.1
-        done
-        
-        # Jika file fim ada, hapus dan keluar dari loop
-        if [[ -e $HOME/fim ]]; then
-            rm -f $HOME/fim
-            break
-        fi
-        
-        echo -e "\033[0;33m]"
-        sleep 1
-        tput cuu1 # Kembali ke baris sebelumnya
-        tput dl1   # Hapus baris sebelumnya
-        echo -ne "  \033[0;33mLagi Menginstal File \033[1;37m- \033[0;33m["
+    for script in "${SCRIPTS[@]}"; do
+        script_name=$(basename "$script")
+        echo -e "\n${CYAN}>>> Mengeksekusi: $script_name${NC}"
+        wget -q "${REPO}${script}" -O "$script_name"
+        chmod +x "$script_name"
+        ./"$script_name"
     done
+}
+
+# ---------------------------------------------------------
+# 7. TELEGRAM NOTIFICATION & FINISHING
+# ---------------------------------------------------------
+send_info_telegram() {
+    local domain ISP CITY RAMMS EXP IZINC author TIME URL TEXT
+    domain=$(cat /etc/xray/domain 2>/dev/null)
+    ISP=$(cat /etc/xray/isp 2>/dev/null)
+    CITY=$(cat /etc/xray/city 2>/dev/null)
+    RAMMS=$(free -m | awk 'NR==2 {print $2}')
+    TIME=$(date +'%Y-%m-%d %H:%M:%S')
+    URL="https://api.telegram.org/bot${KEY}/sendMessage" # Pastikan variabel $KEY & $CHATID diekspor sebelumnya (misal dari tools.sh)
     
-    echo -e "\033[0;33m]\033[1;37m -\033[1;32m Succes !\033[1;37m"
-    tput cnorm # Tampilkan kursor kembali
-}
+    IZINC=$(curl -sS "https://raw.githubusercontent.com/rosicenterstore/izin/main/ip" | grep -w "$MYIP" | awk '{print $3}')
+    author=$(curl -sS "https://raw.githubusercontent.com/rosicenterstore/izin/main/ip" | grep -w "$MYIP" | awk '{print $2}')
+    
+    local d1=$(date -d "$IZINC" +%s 2>/dev/null || echo 0)
+    local d2=$(date +%s)
+    EXP=$(( (d1 - d2) / 86400 ))
 
-
-
-res2() {
-wget ${REPO}install/ssh-vpn.sh && chmod +x ssh-vpn.sh && ./ssh-vpn.sh
-clear
-} 
-
-res3() {
-wget ${REPO}install/ins-xray.sh && chmod +x ins-xray.sh && ./ins-xray.sh
-clear
-}
-
-res4() {
-wget ${REPO}sshws/insshws.sh && chmod +x insshws.sh && ./insshws.sh
-clear
-}
-
-res5() {
-wget ${REPO}install/set-br.sh && chmod +x set-br.sh && ./set-br.sh
-clear
-}
-
-res7() {
-wget ${REPO}menu/update.sh && chmod +x update.sh && ./update.sh
-clear
-}
-
-res8() {
-wget ${REPO}slowdns/installsl.sh && chmod +x installsl.sh && ./installsl.sh
-clear
-}
-
-res9() {
-wget ${REPO}install/udp-custom.sh && chmod +x udp-custom.sh && ./udp-custom.sh
-clear
-}
-if [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "ubuntu" ]]; then
-echo -e "${green}Setup nginx For OS Is $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${NC}"
-setup_ubuntu
-elif [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "debian" ]]; then
-echo -e "${green}Setup nginx For OS Is $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${NC}"
-setup_debian
-else
-echo -e " Your OS Is Not Supported ( ${YELLOW}$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')${FONT} )"
-fi
-}
-function setup_debian(){
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│      PROCESS INSTALLED SSH & OPENVPN     │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res2
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│           PROCESS INSTALLED XRAY         │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res3
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│       PROCESS INSTALLED WEBSOCKET SSH    │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res4
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│       PROCESS INSTALLED BACKUP MENU      │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res5
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│           DOWNLOAD EXTRA MENU            │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res7
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│           DOWNLOAD SYSTEM                │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res8
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│           DOWNLOAD UDP COSTUM            │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res9
-}
-function setup_ubuntu(){
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│      PROCESS INSTALLED SSH & OPENVPN     │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res2
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│           PROCESS INSTALLED XRAY         │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res3
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│       PROCESS INSTALLED WEBSOCKET SSH    │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res4
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│       PROCESS INSTALLED BACKUP MENU      │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res5
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│           DOWNLOAD EXTRA MENU            │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res7
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│           DOWNLOAD SYSTEM                │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res8
-
-echo -e "${green}┌──────────────────────────────────────────┐${NC}"
-echo -e "${green}│           DOWNLOAD UDP COSTUM            │${NC}"
-echo -e "${green}└──────────────────────────────────────────┘${NC}"
-res9
-}
-function iinfo(){
-domain=$(cat /etc/xray/domain)
-TIMES="10"
-URL="https://api.telegram.org/bot$KEY/sendMessage"
-ISP=$(cat /etc/xray/isp)
-CITY=$(cat /etc/xray/city)
-domain=$(cat /etc/xray/domain) 
-TIME=$(date +'%Y-%m-%d %H:%M:%S')
-RAMMS=$(free -m | awk 'NR==2 {print $2}')
-MODEL2=$(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')
-IZINC=$(curl -sS $IZIN | grep $MYIP | awk '{print $3}' )
-author=$(curl -sS $IZIN | grep $MYIP | awk '{print $2}' )
-d1=$(date -d "$IZINC" +%s)
-d2=$(date -d "$today" +%s)
-EXP=$(( (d1 - d2) / 86400 ))
-
-TEXT="
+    TEXT="
 <code>━━━━━━━━━━━━━━━━━━━━</code>
 <code>⚠️ AUTOSCRIPT PREMIUM ⚠️</code>
 <code>━━━━━━━━━━━━━━━━━━━━</code>
@@ -398,76 +211,68 @@ TEXT="
 <code>DOMAIN : </code><code>${domain}</code>
 <code>IP : </code><code>${MYIP}</code>
 <code>ISP : </code><code>${ISP} $CITY</code>
-<code>OS LINUX : </code><code>${MODEL2}</code>
+<code>OS LINUX : </code><code>${OS_NAME}</code>
 <code>RAM : </code><code>${RAMMS} MB</code>
 <code>EXP SCRIPT : </code><code>$EXP Days</code>
 <code>━━━━━━━━━━━━━━━━━━━━</code>
-<i> Notifikasi Installer Script...</i>
-"'&reply_markup={"inline_keyboard":[[{"text":"🔥ᴏʀᴅᴇʀ","url":"https://t.me/FRosi46"},{"text":"🔥GRUP","url":"https://t.me/newbielearning"}]]}'
-curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
-clear
+<i> Notifikasi Installer Script...</i>"
+
+    if [[ -n "$KEY" && -n "$CHATID" ]]; then
+        curl -s --max-time 10 -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" \
+             -d 'reply_markup={"inline_keyboard":[[{"text":"🔥 ORDER","url":"https://t.me/FRosi46"},{"text":"🔥 GRUP","url":"https://t.me/newbielearning"}]]}' \
+             "$URL" >/dev/null
+    fi
 }
-CEKIP
-Installasi
-rm -rf /root/izin > /dev/null 2>&1
-cat> /root/.profile << END
+
+finish_setup() {
+    # Buat profile auto-verify
+    cat > /root/.profile << 'END'
 if [ "$BASH" ]; then
-if [ -f ~/.bashrc ]; then
-. ~/.bashrc
-fi
+  if [ -f ~/.bashrc ]; then
+    . ~/.bashrc
+  fi
 fi
 mesg n || true
 clear
 verify_login
 END
-chmod 644 /root/.profile
-if [ -f "/root/log-install.txt" ]; then
-rm /root/log-install.txt > /dev/null 2>&1
-fi
-if [ -f "/etc/afak.conf" ]; then
-rm /etc/afak.conf > /dev/null 2>&1
-fi
-history -c
-serverV=$( curl -sS ${REPO}versi  )
-echo $serverV > /opt/.ver
-echo "00" > /home/daily_reboot
-aureb=$(cat /home/daily_reboot)
-b=11
-if [ $aureb -gt $b ]
-then
-gg="PM"
-else
-gg="AM"
-fi
-cd
-curl -sS ifconfig.me > /etc/myipvps
-curl -s ipinfo.io/city?token=75082b4831f909 > /etc/xray/city
-curl -s ipinfo.io/org?token=75082b4831f909  | cut -d " " -f 2-10 > /etc/xray/isp
-rm /root/tools.sh >/dev/null 2>&1
-rm /root/setup.sh >/dev/null 2>&1
-rm /root/pointing.sh >/dev/null 2>&1
-rm /root/ssh-vpn.sh >/dev/null 2>&1
-rm /root/ins-xray.sh >/dev/null 2>&1
-rm /root/insshws.sh >/dev/null 2>&1
-rm /root/set-br.sh >/dev/null 2>&1
-rm /root/ohp.sh >/dev/null 2>&1
-rm /root/update.sh >/dev/null 2>&1
-rm /root/installsl.sh >/dev/null 2>&1
-rm /root/udp-custom.sh >/dev/null 2>&1
-secs_to_human "$(($(date +%s) - ${start}))" | tee -a log-install.txt
+    chmod 644 /root/.profile
+
+    # Download Info Metadata
+    curl -sS ifconfig.me > /etc/myipvps
+    curl -s ipinfo.io/city?token=75082b4831f909 > /etc/xray/city
+    curl -s ipinfo.io/org?token=75082b4831f909 | cut -d " " -f 2-10 > /etc/xray/isp
+
+    # Cleanup File Instalasi
+    rm -rf /root/izin /root/*.sh /etc/afak.conf /root/log-install.txt >/dev/null 2>&1
+    history -c
+    
+    serverV=$(curl -sS "${REPO}versi" 2>/dev/null)
+    echo "${serverV:-1.0}" > /opt/.ver
+    echo "00" > /home/daily_reboot
+
+    secs_to_human "$(( $(date +%s) - START_TIME ))" | tee -a /root/log-install.txt
+}
+
+# ---------------------------------------------------------
+# EKSEKUSI UTAMA (MAIN)
+# ---------------------------------------------------------
+CEKIP
+setup_awal
+installasi_sistem
+send_info_telegram
+finish_setup
+
+clear
+echo -e "${GREEN}┌────────────────────────────────────────────┐${NC}"
+echo -e "${GREEN}│  INSTALL SCRIPT SELESAI..                  │${NC}"
+echo -e "${GREEN}└────────────────────────────────────────────┘${NC}"
 sleep 3
-echo  ""
-cd
-iinfo
-echo -e "${green}┌────────────────────────────────────────────┐${NC}"
-echo -e "${green}│  Install SCRIPT SELESAI..                  │${NC}"
-echo -e "${green}└────────────────────────────────────────────┘${NC}"
-echo  ""
-sleep 4
-echo -e "[ ${yell}WARNING${NC} ] Do you want to reboot now ? (y/n)? "
-read answer
+
+echo -e "\n[ ${YELLOW}WARNING${NC} ] Do you want to reboot now ? (y/n)? "
+read -r answer
 if [[ "$answer" =~ ^[Yy]$ ]]; then
     reboot
 else
-    source .profile
+    source ~/.profile
 fi
